@@ -68,13 +68,6 @@ lines(x, power_2(50,x), col="black")
 ```
 
 
-
-
-
-
-
-
-
 ```{r}
 library(dplyr)
 ```
