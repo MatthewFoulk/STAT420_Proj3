@@ -1,0 +1,265 @@
+---
+title: "Hypothesis Tests, Confidence Intervals, Linear Regression"
+author: "Student_Name/University ID"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    number_sections: yes
+    toc: yes  
+---
+
+# Power Functions for Hypothesis Tests 
+
+## $H_0 : \mu \le \mu_0$ and $H_1: \mu > \mu_0$
+Suppose the population has the normal distribution, and $\mu_0 = 5$ and $\sigma^2 = 1.2$. Write a function 'power_1' that takes input: $n$ the sample size, and $\mu$ - and returns the power function for a size $\alpha = 0.05$ hypothesis test. 
+
+```{r}
+
+```
+
+
+Plot the graphs of the power function (as a function of $\mu$) for the following values of $n$: 1 (red), 2(purple), 3 (blue), 5 (brown), 10 (green), 50 (black). All the graphs must be on the same plot.
+
+```{r}
+
+```
+
+## $H_0 : \mu = \mu_0$ and $H_1: \mu \neq \mu_0$
+Suppose the population has the normal distribution, and $\mu_0 = 5$ and $\sigma^2 = 1.2$. Write a function 'power_1' that takes input: $n$ the sample size, and $\mu$ - and returns the power function for a size $\alpha = 0.05$ hypothesis test. 
+
+```{r}
+
+```
+
+
+Plot the graphs of the power function (as a function of $\mu$) for the following values of $n$: 1 (red), 2(purple), 3 (blue), 5 (brown), 10 (green), 50 (black). All the graphs must be on the same plot.
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+library(dplyr)
+```
+
+
+# Confidence Intervals
+The goal of this problem is to understand Confidence Intervals using simulations. Recall that saying that you have a 95% confidence interval means that if under repeated sampling, 95% of the confidence intervals around the sample statistic will contain the population parameter. 
+
+## CI functions
+Suppose population has the distribution $\text{Exp}(\lambda = 5)$. Use the pivotal quantity coming from the MLE to calculate a 95% confidence interval for $\lambda$. Call this function 'CI_Exp_Lambda'.
+
+```{r}
+
+```
+
+Suppose population has the distribution $N(\mu = 10, \sigma^2 = 4)$. Use the pivotal quantity coming from the MLE to calculate a 95% confidence interval for $\mu^2$ (assume $\sigma^2$ is known). 
+
+```{r}
+
+```
+
+## Simulations for Confidence Intervals
+We will simulate the calculation of a 95% confidence interval for a large number of samples of a fixed size from a population distribution whose mean we know.
+We will then count the number of intervals that contain the population mean. 
+
+Use the replicate function to run a simulation of the following experiment: 
+<l>
+<li> set seed equal to 2022 </li>
+<li> calculate 100000 samples of size 50 from the population distribution: exponential with rate parameter $\lambda = 4$.</li>
+<li> use the mean_inside_CI function to check if the mean lies inside the confidence interval, and store this result in the vector 'CI_95_exp'.</li>
+<li> caculate the mean of 'CI_95_exp' to get the expected number of confidence intervals that contain the population mean. </li>
+</l>
+What do you notice?
+```{r}
+ci_95_norm <- function(n){
+  samp <- rnorm(n, mean = 3, sd = 1.2)
+  return(conf_inf(samp))
+}
+
+
+
+# set.seed(2020)
+# B <- 10000
+# n <- 50
+# CI_95_exp <- replicate(B,
+#                            {samp <- rexp(n, rate = 2)
+#                            mean_inside_CI(samp, pop_mu =______ , pop_sig = _____)
+#                            })
+# mean( _____ ) #calculate mean CI_95_exp to get empirical expected values
+```
+
+Use the replicate function to run a simulation of the following experiment: 
+<l>
+<li> set seed equal to 2020 </li>
+<li> calculate 100000 samples of size 50 from the population distribution: $\text{Exp}(\lambda)$ </li>
+<li> write a function meansq_inside_CI function to check if $\mu^2$ lies inside the confidence interval coming from the pivotal quantity obtained from the distribution of the MLE, and store this result in the vector 'CI_95_meansq'.</li>
+<li> caculate the mean of 'CI_95_meansq' to get the expected number of confidence intervals that contain the population parameter $\mu^2$ </li>
+</l>
+What do you notice?
+```{r}
+
+```
+
+Use the replicate function to run a simulation of the following experiment: 
+<l>
+<li> set seed equal to 2020 </li>
+<li> calculate 100000 samples of size 50 from the population distribution: $N(\mu = 10, \sigma = 4)$ </li>
+<li> write a function lambda_inside_CI function to check if lambda lies inside the confidence interval coming from the pivotal quantity obtained from the distribution of the MLE, and store this result in the vector 'CI_95_lambda'.</li>
+<li> caculate the mean of 'CI_95_lambda' to get the expected number of confidence intervals that contain the population parameter $\lambda$ </li>
+</l>
+What do you notice?
+```{r}
+
+```
+
+## Visualizing confidence intervals when variance is known. 
+In this section we will visualize confidence intervals. Recall that "calculating a 95% confidence interval" means: under repeated sampling 95% of the confidence intervals around the sample mean will contain the population mean. 
+
+The following function "plot_CI_95" plots 95%-confidence intervals about 100 sample means coming from samples of size 30 and a normal population distribution with mean 5 and stadard deviation 1.2. 
+<l>
+<li> The function takes input a random seed value and outputs a bunch of confidence intervals. </li>
+<li>The confidence intervals that do not contain the population mean are plotted in red. </li>
+<li>The sample means are plotted as black dots in the middle of the confidence interval. </li>
+<li>The population mean is identified by a blue vertical line (note that the red confidence intervals do not intersect this line). </li>
+</l>
+
+```{r}
+CI_95 <- function(samp, sig){
+  z <- qnorm(0.025, lower.tail = FALSE)
+  upper <- mean(samp) + z*sig/sqrt(length(samp))
+  lower <- mean(samp) - z*sig/sqrt(length(samp))
+  return(c(lower, upper))
+}
+```
+
+
+Get familiar with the function "plot_CI_95" by evaluating it for a few different seed values.
+```{r}
+plot_CI_95 <- function(seed){
+  B <- 100
+  n <- 30
+  mu <- 5
+  sig <- 1.2
+  set.seed(seed)
+  #extract upper bound of CI's
+  x_1 <- replicate(B,
+                         {samp <- rnorm(n, mean = mu, sd = sig )
+                         max(CI_95(samp, sig))
+                         }
+                         )
+  #extract lower bound of CI's
+  set.seed(seed)
+  x_0 <- replicate(B,
+                         {samp <- rnorm(n, mean = mu, sd = sig )
+                         min(CI_95(samp, sig))
+                         }
+                         )
+  set.seed(seed)
+  means <- replicate(B, mean(rnorm(n, mean = mu, sd = sig)))
+ 
+  plot(means, 1:B, 
+       pch = 20,
+      xlim = c(mu - sig, mu + sig), 
+      ylim = c(0,B+1),
+      xlab = "sample means",
+      ylab = "index of the CI",
+      main = paste(B, "Confidence intervals"))
+  for (i in 1:B){
+  if(between(mu, x_0[i], x_1[i])){
+  segments(x_0[i], i, x_1[i], i, lwd = 2) #plot CI's that contain the mean in black
+    }
+  else
+    {
+    segments(x_0[i], i, x_1[i], i, col = "red", lwd = 2) #plot CI's that don't contain the mean in red
+    }
+    }
+abline(v=mu, col = "blue") #plot a vertical line at the population mean
+}
+
+plot_CI_95(402)
+```
+
+Now use the "Plot_CI_95" function to plot at six different values of the random seed. What do you observe?
+
+```{r}
+# seeds <- c(_________) #choose six different seed values
+# par(mfrow = c(1,2))
+# for (i in seeds){
+#   plot_CI_95(____)
+# }
+```
+
+## Visualizing CI's for $\lambda$
+Modify the above code to visualize the confidence intervals in the case when we are calculating 95% confidence intervals for $\lambda$ when sampling from a population that has distribution $\text{Exp}(\lambda = 5)$
+```{r}
+
+```
+
+## Visualizing CI's for $\mu^2$
+Modify the above code to visualize the confidence intervals in the case when we are calculating 95% confidence intervals for $\mu^2$ when sampling from a population that has distribution $N(\mu = 10, \sigma^2 = 4)$
+```{r}
+
+```
+
+
+# Linear Regression
+Recall that random samples for simple regression look like $\{(x_i, Y_i)\;  | \;\;Y_i = \alpha + \beta x_i + \epsilon_i \}$. Note that $\alpha, \beta$ and $\sigma$ are model parameters and $\{\epsilon_i \;\;| \;\; \epsilon_i \sim N(0, \sigma^2), i = 1, 2, 3, \dots, n. \}$
+
+## Setup the random samples
+Suppose we are working with a simple linear model with parameters: $$\alpha = 3, \beta = 5, \sigma^2 = 1.6$$ 
+
+Construct the random variable that generates the sample data for our model:
+```{r}
+# alpha <- ____
+# beta <- ___
+# sig <- ____
+# 
+# x_fixed <- round(seq(3, 8, length.out = 15), 2)
+# Y <- function(______){}
+
+#Random Samples for Simple Linear Regression.
+
+#Assume the true regression line is y = 2+3x
+
+```
+
+
+## Define the statistics
+Define the statistics that take input two vectors $x$ and $y$ and output estimates for (1) the slople parameter, (2) the intercept parameter, (3) the variance parameter, (4) the predition for a given value of x. 
+
+```{r}
+# a_hat <- function(){}
+# 
+# b_hat <- function(){}
+# 
+# v_hat <- function(){}
+# 
+Y_hat <- function(samp, x){
+  return(alpha_hat(samp) + beta_hat(samp)*x)
+}
+```
+
+
+## Estimated regression lines
+Plot the line regression line $y = 3+5x$, for $x$ in 'x_fixed'. In this same plot, add 50 estimated regression lines coming from 50 different samples for the linear regression model. 
+
+```{r}
+
+```
+
+## Sampling Distribution of the Slope parameter
+Empirically verify that the sampling distribution of the slope parmeter is a normal distribution. 
+```{r}
+
+```
+What is the empirical variance? Compare this with the theoretical variance. 
