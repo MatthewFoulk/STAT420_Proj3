@@ -29,7 +29,7 @@ Plot the graphs of the power function (as a function of $\mu$) for the following
 
 ```{r}
 x <-seq(from = 0, to = 10, length.out = 10000)
-plot(x, power_1(1,x), type="l", col="red")
+plot(x, power_1(1,x), type="l", col="red", xlab="Mu", ylab="Power")
 lines(x, power_1(2,x), col="purple")
 lines(x, power_1(3,x), col="blue")
 lines(x, power_1(5,x), col="brown")
