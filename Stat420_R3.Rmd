@@ -20,7 +20,7 @@ power_1 <- function(n, x){
   mu_0 <- 5
   alpha <- 0.05
   zalpha <- qnorm(p=alpha, lower.tail=FALSE)
-  return (1 - pnorm((zalpha + sqrt(n)*(mu_0 - x))*(1/sigma)))
+  return (1 - pnorm(zalpha + sqrt(n)*(mu_0 - x))*1/sigma)
 }
 ```
 
@@ -46,8 +46,8 @@ power_2 <- function(n, x){
   mu_0 <- 5
   alpha <- 0.05
   zalpha2 <- qnorm(p=alpha/2, lower.tail=FALSE) 
-  pos <- pnorm((zalpha2 + sqrt(n)*(mu_0 - x))*(1/sigma))
-  neg <- pnorm((-zalpha2 - sqrt(n)*(mu_0 - x))*(1/sigma))
+  pos <- pnorm(zalpha2 + sqrt(n)*(mu_0 - x)*(1/sigma))
+  neg <- pnorm(-zalpha2 - sqrt(n)*(mu_0 - x)*(1/sigma))
   return (1-pos+neg)
 }
 ```
