@@ -19,8 +19,8 @@ power_1 <- function(n, x){
   sigma = sqrt(1.2)
   mu_0 <- 5
   alpha <- 0.05
-  zalpha <- qnorm(p=alpha, lower.tail=TRUE)
-  return (1 - pnorm(zalpha + sqrt(n)*(mu_0 - x)*(1/sigma)))
+  zalpha <- qnorm(p=alpha, lower.tail=FALSE)
+  return (1 - pnorm((zalpha + sqrt(n)*(mu_0 - x))*(1/sigma)))
 }
 ```
 
@@ -38,17 +38,31 @@ lines(x, power_1(50,x), col="black")
 ```
 
 ## $H_0 : \mu = \mu_0$ and $H_1: \mu \neq \mu_0$
-Suppose the population has the normal distribution, and $\mu_0 = 5$ and $\sigma^2 = 1.2$. Write a function 'power_1' that takes input: $n$ the sample size, and $\mu$ - and returns the power function for a size $\alpha = 0.05$ hypothesis test. 
+Suppose the population has the normal distribution, and $\mu_0 = 5$ and $\sigma^2 = 1.2$. Write a function 'power_2' that takes input: $n$ the sample size, and $\mu$ - and returns the power function for a size $\alpha = 0.05$ hypothesis test. 
 
 ```{r}
-
+power_2 <- function(n, x){
+  sigma = sqrt(1.2)
+  mu_0 <- 5
+  alpha <- 0.05
+  zalpha2 <- qnorm(p=alpha/2, lower.tail=FALSE) 
+  pos <- pnorm((zalpha2 + sqrt(n)*(mu_0 - x))*(1/sigma))
+  neg <- pnorm((-zalpha2 - sqrt(n)*(mu_0 - x))*(1/sigma))
+  return (1-pos+neg)
+}
 ```
 
 
 Plot the graphs of the power function (as a function of $\mu$) for the following values of $n$: 1 (red), 2(purple), 3 (blue), 5 (brown), 10 (green), 50 (black). All the graphs must be on the same plot.
 
 ```{r}
-
+x <-seq(from = 0, to = 10, length.out = 10000)
+plot(x, power_2(1,x), type="l", col="red", xlab="Mu", ylab="Power")
+lines(x, power_2(2,x), col="purple")
+lines(x, power_2(3,x), col="blue")
+lines(x, power_2(5,x), col="brown")
+lines(x, power_2(10,x), col="green")
+lines(x, power_2(50,x), col="black")
 ```
 
 
