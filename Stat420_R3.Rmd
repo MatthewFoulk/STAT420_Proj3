@@ -15,14 +15,26 @@ output:
 Suppose the population has the normal distribution, and $\mu_0 = 5$ and $\sigma^2 = 1.2$. Write a function 'power_1' that takes input: $n$ the sample size, and $\mu$ - and returns the power function for a size $\alpha = 0.05$ hypothesis test. 
 
 ```{r}
-
+power_1 <- function(n, x){
+  sigma = sqrt(1.2)
+  mu_0 <- 5
+  alpha <- 0.05
+  zalpha <- qnorm(p=alpha, lower.tail=TRUE)
+  return (1 - pnorm(zalpha + sqrt(n)*(mu_0 - x)*(1/sigma)))
+}
 ```
 
 
 Plot the graphs of the power function (as a function of $\mu$) for the following values of $n$: 1 (red), 2(purple), 3 (blue), 5 (brown), 10 (green), 50 (black). All the graphs must be on the same plot.
 
 ```{r}
-
+x <-seq(from = 0, to = 10, length.out = 10000)
+plot(x, power_1(1,x), type="l", col="red")
+lines(x, power_1(2,x), col="purple")
+lines(x, power_1(3,x), col="blue")
+lines(x, power_1(5,x), col="brown")
+lines(x, power_1(10,x), col="green")
+lines(x, power_1(50,x), col="black")
 ```
 
 ## $H_0 : \mu = \mu_0$ and $H_1: \mu \neq \mu_0$
@@ -220,12 +232,12 @@ Suppose we are working with a simple linear model with parameters: $$\alpha = 3,
 
 Construct the random variable that generates the sample data for our model:
 ```{r}
-# alpha <- ____
-# beta <- ___
-# sig <- ____
-# 
-# x_fixed <- round(seq(3, 8, length.out = 15), 2)
-# Y <- function(______){}
+alpha <- 3
+beta <- 5
+sig <- sqrt(1.6)
+
+x_fixed <- round(seq(3, 8, length.out = 15), 2)
+Y <- function(alpha, beta, sig){}
 
 #Random Samples for Simple Linear Regression.
 
