@@ -98,6 +98,13 @@ the pivotal quantity coming from the MLE to calculate a 95% confidence
 interval for $\lambda$. Call this function 'CI_Exp_Lambda'.
 
 ```{r}
+CI_Exp_Lambda <- function(n){
+  xbar = mean(rexp(n, 5))
+  left = (qchisq(p=1-.05/2, df=2*n, lower.tail=TRUE))/(2*n*xbar)
+  right = (qchisq(p=.05/2, df=2*n, lower.tail=TRUE))/(2*n*xbar)
+  return(c(left, right))
+}
+
 
 ```
 
@@ -106,6 +113,12 @@ the pivotal quantity coming from the MLE to calculate a 95% confidence
 interval for $\mu^2$ (assume $\sigma^2$ is known).
 
 ```{r}
+CI_Normal_Mu <- function(n){
+  xbar = mean(rnorm(n, mean=10, sd=2))
+  left = xbar - qnorm(p=.05/2)*2/sqrt(n)
+  right = xbar + qnorm(p=.05/2)*2/sqrt(n)
+  return(c(left, right))
+}
 
 ```
 
@@ -134,6 +147,7 @@ confidence intervals that contain the population mean.</li>
 </l> What do you notice?
 
 ```{r}
+
 ci_95_norm <- function(n){
   samp <- rnorm(n, mean = 3, sd = 1.2)
   return(conf_inf(samp))
@@ -141,15 +155,17 @@ ci_95_norm <- function(n){
 
 
 
-# set.seed(2020)
-# B <- 10000
-# n <- 50
-# CI_95_exp <- replicate(B,
-#                            {samp <- rexp(n, rate = 2)
-#                            mean_inside_CI(samp, pop_mu =______ , pop_sig = _____)
-#                            })
-# mean( _____ ) #calculate mean CI_95_exp to get empirical expected values
-```
+ set.seed(2022)
+ B <- 100000
+ n <- 50
+ CI_95_exp <- replicate(B,
+                            {samp <- rexp(n, rate = 4)
+                            mean_inside_CI(samp, pop_mu = 1/4 , pop_sig = 1/16)  # I CANNOT GET THIS TO WORK, MY MACHINE REFUSES TO FIND mean_inside_ci :(((, do we have to make it or is it in the library that won't work on my machine (dplyr)?
+                            })
+ mean( CI_95_exp ) #calculate mean CI_95_exp to get empirical expected values
+ 
+
+ ```
 
 Use the replicate function to run a simulation of the following
 experiment: <l>
@@ -170,6 +186,16 @@ confidence intervals that contain the population parameter $\mu^2$</li>
 </l> What do you notice?
 
 ```{r}
+set.seed(2020)
+n <- 50
+B <- 100000
+CI_95_exp2 <- replicate(B, {samp <- rexp(n,rate=4)})
+
+CI_95_meansq = vec()
+
+meansq_inside_CI <- function(n){
+  
+}
 
 ```
 
@@ -193,6 +219,7 @@ $\lambda$</li>
 </l> What do you notice?
 
 ```{r}
+# I do not understand these instructions
 
 ```
 
@@ -282,11 +309,12 @@ Now use the "Plot_CI_95" function to plot at six different values of the
 random seed. What do you observe?
 
 ```{r}
-# seeds <- c(_________) #choose six different seed values
-# par(mfrow = c(1,2))
-# for (i in seeds){
-#   plot_CI_95(____)
-# }
+ seeds <- c(10, 80, 15, 1, 1000, 8918) #choose six different seed values
+ par(mfrow = c(1,2))
+ for (i in seeds){
+   plot_CI_95(i)
+ }
+ # I notice that the number of confidence intervals out of 100 are consistently around 5 for different random seeds. This is expected since our confidence is 95%, which means we'd expect 5% of CI's to not contain the mean.  
 ```
 
 ## Visualizing CI's for $\lambda$
@@ -294,22 +322,123 @@ random seed. What do you observe?
 Modify the above code to visualize the confidence intervals in the case
 when we are calculating 95% confidence intervals for $\lambda$ when
 sampling from a population that has distribution
-$\text{Exp}(\lambda = 5)$
+$\text{Exp}(\lambda = 5)$. Do two experiments: (1) with samples of size 8, (2) samples of size 60. What do you notice?
 
 ```{r}
+my_CI_95 <- function(samp, sig){
+  z <- qnorm(0.025, lower.tail = FALSE)
+  upper <- mean(samp) + z*sig/sqrt(length(samp))
+  lower <- mean(samp) - z*sig/sqrt(length(samp))
+  return(c(lower, upper))
+}
+my_plot_CI_95 <- function(seed, n){
+  B <- 100
+  n <- n
+  mu <- 1/5
+  sig <- 1/5
+  set.seed(seed)
+  #extract upper bound of CI's
+  x_1 <- replicate(B,
+                         {samp <- rexp(n, 1/mu)
+                         max(my_CI_95(samp, sig))
+                         }
+                         )
+  #extract lower bound of CI's
+  set.seed(seed)
+  x_0 <- replicate(B,
+                         {samp <- rexp(n, 1/mu)
+                         min(my_CI_95(samp, sig))
+                         }
+                         )
+  set.seed(seed)
+  means <- replicate(B, mean(rexp(n, mu)))
+ 
+  plot(means, 1:B, 
+       pch = 20,
+      xlim = c(mu - sig, mu + sig), 
+      ylim = c(0,B+1),
+      xlab = "sample means",
+      ylab = "index of the CI",
+      main = paste(B, "Confidence intervals"))
+  for (i in 1:B){
+  if(between(mu, x_0[i], x_1[i])){
+  segments(x_0[i], i, x_1[i], i, lwd = 2) #plot CI's that contain the mean in black
+    }
+  else
+    {
+    segments(x_0[i], i, x_1[i], i, col = "red", lwd = 2) #plot CI's that don't contain the mean in red
+    }
+    }
+abline(v=1/mu, col = "blue") #plot a vertical line at the population mean
+}
+
+my_plot_CI_95(402, 8)
+my_plot_CI_95(402, 60)
 
 ```
+I noticed that the CI's for n = 60 are much smaller and precise than the CI's for n = 8.
 
 ## Visualizing CI's for $\mu^2$
 
 Modify the above code to visualize the confidence intervals in the case
 when we are calculating 95% confidence intervals for $\mu^2$ when
 sampling from a population that has distribution
-$N(\mu = 10, \sigma^2 = 4)$
+$N(\mu = 10, \sigma^2 = 4)$ Do two experiments: (1) with samples of size 8, (2) samples of size 60. What do you notice?
 
 ```{r}
+my_CI_95 <- function(samp, sig){
+  z <- qnorm(0.025, lower.tail = FALSE)
+  upper <- (mean(samp))^2 + z*sig/sqrt(length(samp))
+  lower <- (mean(samp))^2 - z*sig/sqrt(length(samp))
+  return(c(lower, upper))
+}
+my_plot_CI_95 <- function(seed, n){
+  B <- 100
+  n <- n
+  mu <- 10
+  sig <- 2
+  set.seed(seed)
+  #extract upper bound of CI's
+  x_1 <- replicate(B,
+                         {samp <- rnorm(n, mu, sig)
+                         max(my_CI_95(samp, sig))
+                         }
+                         )
+  #extract lower bound of CI's
+  set.seed(seed)
+  x_0 <- replicate(B,
+                         {samp <- rnorm(n, mu, sig)
+                         min(my_CI_95(samp, sig))
+                         }
+                         )
+  set.seed(seed)
+  means <- replicate(B, (mean(rnorm(n, mu, sig))))
+ 
+  plot(means^2, 1:B, 
+       pch = 20,
+      xlim = c(mu^2 - sig, mu^2 + sig), 
+      ylim = c(0,B+1),
+      xlab = "sample means",
+      ylab = "index of the CI",
+      main = paste(B, "Confidence intervals"))
+  for (i in 1:B){
+  if(between(mu^2, x_0[i], x_1[i])){
+  segments(x_0[i], i, x_1[i], i, lwd = 2) #plot CI's that contain the mean in black
+    }
+  else
+    {
+    segments(x_0[i], i, x_1[i], i, col = "red", lwd = 2) #plot CI's that don't contain the mean in red
+    }
+    }
+abline(v=mu^2, col = "blue") #plot a vertical line at the population mean
+}
+
+my_plot_CI_95(402, 8)
+my_plot_CI_95(402, 60)
 
 ```
+I notice that with larger n, the CI's are more accurate. 
+
 
 # Linear Regression
 
