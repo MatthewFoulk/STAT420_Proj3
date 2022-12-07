@@ -148,9 +148,17 @@ confidence intervals that contain the population mean.</li>
 
 ```{r}
 
-ci_95_norm <- function(n){
-  samp <- rnorm(n, mean = 3, sd = 1.2)
+ci_95_exp <- function(n){
+  samp <- rexp(n, 4)
   return(conf_inf(samp))
+}
+
+mean_inside_ci <- function(samp, pop_mu, pop_sig){
+  if(between(pop_mu, mean(samp), mean(samp))){
+    return(1)
+  }else{
+    return(0)
+  }
 }
 
 
@@ -158,12 +166,10 @@ ci_95_norm <- function(n){
  set.seed(2022)
  B <- 100000
  n <- 50
- CI_95_exp <- replicate(B,
-                            {samp <- rexp(n, rate = 4)
-                            mean_inside_CI(samp, pop_mu = 1/4 , pop_sig = 1/16)  # I CANNOT GET THIS TO WORK, MY MACHINE REFUSES TO FIND mean_inside_ci :(((, do we have to make it or is it in the library that won't work on my machine (dplyr)?
-                            })
- mean( CI_95_exp ) #calculate mean CI_95_exp to get empirical expected values
- 
+ CI_95_exp <- replicate(B,{samp <- rexp(n, rate = 4)
+                            mean_inside_ci(samp, pop_mu = 1/4 , pop_sig = 1/4)}) 
+                            
+ print(mean(CI_95_exp)) #calculate mean CI_95_exp to get empirical expected values
 
  ```
 
@@ -314,8 +320,9 @@ random seed. What do you observe?
  for (i in seeds){
    plot_CI_95(i)
  }
- # I notice that the number of confidence intervals out of 100 are consistently around 5 for different random seeds. This is expected since our confidence is 95%, which means we'd expect 5% of CI's to not contain the mean.  
+   
 ```
+I notice that the number of confidence intervals out of 100 are consistently around 5 for different random seeds. This is expected since our confidence is 95%, which means we'd expect 5% of CI's to not contain the mean.
 
 ## Visualizing CI's for $\lambda$
 
