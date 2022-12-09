@@ -558,7 +558,7 @@ x_fixed <- seq(5, 10, length.out = 15)
 true_line <- 3+5*x_fixed
 
 #y <- Y_hat(alpha = 3, beta = 5, sig =5)
-y_hat <- Y_hat(x_fixed,y)
+y_hat <- Y_hat(x_fixed,true_line)
 
 #plot(x_fixed, y)
 #lines(x_fixed, true_line, col='red')
