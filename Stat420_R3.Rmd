@@ -165,14 +165,16 @@ mean_inside_CI <- function(samp, pop_mu, pop_sig){
  set.seed(2022)
  B <- 100000
  n <- 50
- CI_95_exp <- replicate(B,
-      {samp <- rexp(n,4)
-      mean_inside_CI(samp, pop_mu = 1/4 , pop_sig = 1/4)
-      }) 
+ CI_95_exp <- replicate(B,{
+  samp <- rexp(n,4)
+  mean_inside_CI(samp, pop_mu = 1/4 , pop_sig = 1/4)
+  }) 
                             
  print(mean(CI_95_exp)) #calculate mean CI_95_exp to get empirical expected values
 
 ```
+What do you notice?
+- We notice that the value is very close to 95.
 
 Use the replicate function to run a simulation of the following
 experiment: <l>
@@ -191,12 +193,28 @@ from the distribution of the MLE, and store this result in the vector
 confidence intervals that contain the population parameter $\mu^2$</li>
 
 </l> What do you notice?
+```{r}
+mu2_me_95 <- function(sample_vals, sig){
+    n <- length(sample_vals)
+    xbar <- mean(sample_vals)
+    mar_err <- 1.96*(2*sig*xbar/sqrt(n))
+}
+```
+
+```{r}
+meansq_inside_CI <- function(samp, pop_mu, pop_sig){
+    upper <- mean(samp)^2 + mu2_me_95(samp, pop_sig)
+    lower <- mean(samp)^2 - mu2_me_95(samp, pop_sig)
+    return(between(pop_mu, lower, upper))
+}
+```
 
 ```{r}
 set.seed(2020)
 n <- 50
 B <- 100000
-CI_95_exp2 <- replicate(B, {samp <- rexp(n,rate=4)})
+CI_95_exp2 <- replicate(B, {
+    samp <- rexp(n,rate=4)})
 
 CI_95_meansq = vec()
 
@@ -226,9 +244,34 @@ $\lambda$</li>
 </l> What do you notice?
 
 ```{r}
-# I do not understand these instructions
-
+mu2_me_95 <- function(sample_vals, sig){
+    n <- length(sample_vals)
+    xbar <- mean(sample_vals)
+    mar_err <- 1.96*(2*sig*xbar/sqrt(n))
+}
 ```
+
+```{r}
+meansq_inside_CI <- function(samp, pop_mu, pop_sig){
+    upper <- mean(samp)^2 + mu2_me_95(samp, pop_sig)
+    lower <- mean(samp)^2 - mu2_me_95(samp, pop_sig)
+    return(between(pop_mu^2, lower, upper))
+}
+```
+
+```{r}
+set.seed(2020)
+n <- 50
+B <- 100000
+CI_95_meansq <- replicate(B, {
+    samp <- rnorm(n,mean=10,sd=4)
+    meansq_inside_CI(samp, pop_mu = 10, pop_sig = 4)
+    })
+
+print(mean(CI_95_meansq))
+```
+What do you notice?
+- We notice that it is almost exactly 95%
 
 ## Visualizing confidence intervals when variance is known.
 
