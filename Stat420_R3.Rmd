@@ -105,9 +105,8 @@ CI_Exp_Lambda <- function(n){
   right = (qchisq(p=.05/2, df=2*n, lower.tail=TRUE))/(2*n*xbar)
   return(c(left, right))
 }
-
-
 ```
+
 
 Suppose population has the distribution $N(\mu = 10, \sigma^2 = 4)$. Use
 the pivotal quantity coming from the MLE to calculate a 95% confidence
@@ -174,38 +173,30 @@ mean_inside_CI <- function(samp, pop_mu, pop_sig){
 
 ```
 What do you notice?
-- We notice that the value is very close to 95.
+- We notice that the value is very close to 95%.
 
-Use the replicate function to run a simulation of the following
-experiment: <l>
+### CI for $\lambda$ parameter of $\text{Exp}(\lambda)$. 
+Use the replicate function to run a simulation of the following experiment: 
+<l>
+<li> set seed equal to 2020 </li>
+<li> calculate 10000 samples of size 50 from the population distribution: $\text{Exp}(\lambda)$ </li>
+<li> write a function 'lambda_inside_CI' to check if lambda lies inside the confidence interval coming from the pivotal quantity obtained from the distribution of the MLE, and store this result in the vector 'CI_95_lambda'.</li>
+<li> caculate the mean of 'CI_95_lambda' to get the expected number of confidence intervals that contain the population parameter $\lambda$ </li>
+</l>
 
-<li>set seed equal to 2020</li>
-
-<li>calculate 100000 samples of size 50 from the population
-distribution: $\text{Exp}(\lambda)$</li>
-
-<li>write a function meansq_inside_CI function to check if $\mu^2$ lies
-inside the confidence interval coming from the pivotal quantity obtained
-from the distribution of the MLE, and store this result in the vector
-'CI_95_meansq'.</li>
-
-<li>caculate the mean of 'CI_95_meansq' to get the expected number of
-confidence intervals that contain the population parameter $\mu^2$</li>
-
-</l> What do you notice?
 ```{r}
-mu2_me_95 <- function(sample_vals, sig){
+margin_error_95_2 <- function(sample_vals){
     n <- length(sample_vals)
     xbar <- mean(sample_vals)
-    mar_err <- 1.96*(2*sig*xbar/sqrt(n))
+    mar_err <- 1.96*(1/(xbar*sqrt(n)))
 }
 ```
 
 ```{r}
-meansq_inside_CI <- function(samp, pop_mu, pop_sig){
-    upper <- mean(samp)^2 + mu2_me_95(samp, pop_sig)
-    lower <- mean(samp)^2 - mu2_me_95(samp, pop_sig)
-    return(between(pop_mu, lower, upper))
+lambda_inside_CI <- function(samp, pop_lambda){
+    upper <- 1/mean(samp) + margin_error_95_2(samp)
+    lower <- 1/mean(samp) - margin_error_95_2(samp)
+    return(between(pop_lambda, lower, upper))
 }
 ```
 
@@ -213,16 +204,15 @@ meansq_inside_CI <- function(samp, pop_mu, pop_sig){
 set.seed(2020)
 n <- 50
 B <- 100000
-CI_95_exp2 <- replicate(B, {
-    samp <- rexp(n,rate=4)})
+CI_95_lambda <- replicate(B, {
+    samp <- rexp(n,rate=4)
+    lambda_inside_CI(samp, 4)
+    })
 
-CI_95_meansq = vec()
-
-meansq_inside_CI <- function(n){
-  
-}
-
+print(mean(CI_95_lambda))
 ```
+What do you notice?
+- It is nearly 95%
 
 Use the replicate function to run a simulation of the following
 experiment: <l>
