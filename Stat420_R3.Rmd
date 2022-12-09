@@ -332,17 +332,18 @@ beta <- 5
 sig <- sqrt(1.6)
 
 x_fixed <- round(seq(3, 8, length.out = 15), 2)
-Y <- function(alpha, beta, sig){
-  alpha + beta*x_fixed + rnorm(1,mean = 0,sd = sig)
+Y <- function(alpha=3, beta=5, sig = sqrt(4)){
+  y <- c()
+  for(x in x_fixed){
+    y<- c(y, alpha + beta*x+ rnorm(1,mean = 0,sd = sig))
+  }
+  return(y)
 }
-#y_vals <-c()
-#for (i in x_fixed){
-#  y_vals <- c(y,rnorm(1,mean = alpha+beta*i,sd = sig))
-#}
-#Random Samples for Simple Linear Regression.
-empirical_results <- Y(3,5,1.6)
-#Assume the true regression line is y = 2+3x
-true_line <- 2+3*x_fixed
+
+y_vals <- Y()
+true_line <- 3+5*x_fixed
+
+#plot(x_fixed, y_vals)
 ```
 
 ## Define the statistics
@@ -352,16 +353,18 @@ estimates for (1) the slope parameter, (2) the intercept parameter, (3)
 the variance parameter, (4) the prediction for a given value of x.
 
 ```{r}
- a_hat <- function(y,x){
-   #using formula derived in class: alpha_mle = Y_bar - B_hat * x_bar
-   return (mean(y)-b_hat(y,x)*mean(x))
- }
- b_hat <- function(y,x){
+ 
+ b_hat <- function(x,y){
    x_bar = mean(x)
    y_bar = mean(y)
    x_diff = x-x_bar
    y_diff = y-y_bar
    return (sum(x_diff*y_diff)/sum(x_diff^2))
+ }
+ 
+ a_hat <- function(x,y){
+   #using formula derived in class: alpha_mle = Y_bar - B_hat * x_bar
+   return (mean(y)-b_hat(x,y)*mean(x))
  }
  v_hat <- function(y){
    y_diff = y-y_bar
@@ -369,9 +372,9 @@ the variance parameter, (4) the prediction for a given value of x.
    return (1/n)*sum(y_diff^2)
  }
 
-Y_hat <- function(y, xvals,x){
+Y_hat <- function(x, y){
   #epsilon = rnorm(1,0,v_hat(samp))
-  return (a_hat(y,xvals) + b_hat(y,xvals)*x)#+epsilon
+  return (a_hat(x,y) + b_hat(x,y)*x)#+epsilon
 }
 ```
 
@@ -382,19 +385,25 @@ same plot, add 50 estimated regression lines coming from 50 different
 samples for the linear regression model.
 
 ```{r}
+x_fixed <- seq(5, 10, length.out = 15)
 true_line <- 3+5*x_fixed
 
-plot(x_fixed, true_line, type = 'l', col = "red",ylim= c(20,60),xlim=c(3,8))
-x_vals <- seq(2,8,length=15)
+#y <- Y_hat(alpha = 3, beta = 5, sig =5)
+y_hat <- Y_hat(x_fixed,y)
+
+#plot(x_fixed, y)
+#lines(x_fixed, true_line, col='red')
+#lines(x_fixed, y_hat, col = 'purple')
+
+plot(x_fixed, true_line, type = 'l', col = "red")
+a_hats <- c()
 for (i in seq(1,50)){
-  #y_vals <- replicate(15,Y(3,5,1.6))
-  y_vals <-c()
-  for (i in x_fixed){
-    y_vals <- c(y,rnorm(1,mean = alpha+beta*i,sd = 1.6))
-  }
-  y_hat <- Y_hat(y_vals,x_fixed,x_vals)
-  lines(x_vals,y_hat)
+  y <- Y(alpha = 3, beta = 5, sig = 1.6)
+  y_hat <-Y_hat(x_fixed,y)
+  lines(x_fixed,y_hat)
+  a_hats <- c(a_hats, a_hat(x_fixed,y))
 }
+lines(x_fixed, true_line, type = 'l', col = "red", lwd = 2.0)
 ```
 
 ## Sampling Distribution of the Slope parameter
@@ -403,8 +412,12 @@ Empirically verify that the sampling distribution of the slope parameter
 is a normal distribution.
 
 ```{r}
-Y_emp <- replicate(Y(3,5,1.6),50)
-a_hat
+a_hats <- c()
+for (i in seq(1,500)){
+  y <- Y(alpha = 3, beta = 5, sig = 1.6)
+  a_hats <- c(a_hats, a_hat(x_fixed,y))
+}
+hist(a_hats)
 ```
 
 What is the empirical variance? Compare this with the theoretical
