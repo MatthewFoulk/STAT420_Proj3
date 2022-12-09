@@ -81,6 +81,7 @@ lines(x, power_2(50,x), col="black")
 ```
 
 ```{r}
+library(rlang)
 library(dplyr)
 ```
 
@@ -145,33 +146,33 @@ confidence interval, and store this result in the vector
 confidence intervals that contain the population mean.</li>
 
 </l> What do you notice?
+```{r}
+margin_error_95 <- function(sample_vals, sig){
+    n <- length(sample_vals)
+    mar_err <- 1.96*(sig/sqrt(n))
+}
+```
 
 ```{r}
-
-ci_95_exp <- function(n){
-  samp <- rexp(n, 4)
-  return(conf_inf(samp))
+mean_inside_CI <- function(samp, pop_mu, pop_sig){
+    upper <- mean(samp) + margin_error_95(samp, pop_sig)
+    lower <- mean(samp) - margin_error_95(samp, pop_sig)
+    return(between(pop_mu, lower, upper))
 }
+```
 
-mean_inside_ci <- function(samp, pop_mu, pop_sig){
-  if(between(pop_mu, mean(samp), mean(samp))){
-    return(1)
-  }else{
-    return(0)
-  }
-}
-
-
-
+```{r}
  set.seed(2022)
  B <- 100000
  n <- 50
- CI_95_exp <- replicate(B,{samp <- rexp(n, rate = 4)
-                            mean_inside_ci(samp, pop_mu = 1/4 , pop_sig = 1/4)}) 
+ CI_95_exp <- replicate(B,
+      {samp <- rexp(n,4)
+      mean_inside_CI(samp, pop_mu = 1/4 , pop_sig = 1/4)
+      }) 
                             
  print(mean(CI_95_exp)) #calculate mean CI_95_exp to get empirical expected values
 
- ```
+```
 
 Use the replicate function to run a simulation of the following
 experiment: <l>
